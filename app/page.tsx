@@ -2,19 +2,96 @@
 
 import Image from 'next/image';
 import { useMemo, useState } from 'react';
-import { ArrowDown, ArrowDownRight, ArrowRight, ArrowUpRight, BriefcaseBusiness, Code2, Github, Linkedin, Mail, MapPin, Menu, MessageCircle, Phone, Search, X } from 'lucide-react';
+import { ArrowDown, ArrowDownRight, ArrowRight, ArrowUp, ArrowUpRight, BriefcaseBusiness, Code2, Github, Linkedin, Mail, MapPin, Menu, MessageCircle, Phone, Search, Sparkles, X } from 'lucide-react';
 import { projects, type Project } from './projects';
+import { CardCarousel, CardDetailsPanel, ModalGallery } from './ProjectCarousel';
 
 const roles = ['Mobile Application Developer', 'Web Developer', 'Full-Stack Developer', 'Flutter Developer', 'Laravel Developer'];
 const featuredIds = [1, 2, 12, 16, 20, 14];
 const categories = ['All', 'Mobile', 'Web'];
 
 function ProjectCard({ project, featured = false, onOpen }: { project: Project; featured?: boolean; onOpen: (project: Project) => void }) {
-  return <button className={`project-card ${featured ? 'featured' : ''}`} onClick={() => onOpen(project)} aria-label={`View details for ${project.title}`}>
-    <div className="card-top"><span className="project-number">{String(project.id).padStart(2, '0')}</span><span className="project-type">{project.type}</span><ArrowUpRight size={18} aria-hidden="true" /></div>
-    <div className={`project-art art-${project.id}`} aria-hidden="true"><div className="art-orb"/><span>{project.mark}</span></div>
-    <div className="project-copy"><h3>{project.title}</h3><p>{project.summary}</p><div className="tag-row">{project.stack.slice(0, 4).map(tag => <span className="tag" key={tag}>{tag}</span>)}</div></div>
-  </button>;
+  const [activeTab, setActiveTab] = useState<'preview' | 'details'>('preview');
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      className={`project-card ${featured ? 'featured' : ''} ${activeTab === 'details' ? 'view-details-active' : ''}`}
+      onClick={() => onOpen(project)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onOpen(project);
+        }
+      }}
+      aria-label={`View details for ${project.title}`}
+    >
+      <div className="card-top">
+        <span className="project-number">{String(project.id).padStart(2, '0')}</span>
+        <span className="project-type">{project.type}</span>
+
+        {/* Tab switch pills */}
+        <div className="card-tab-pills" onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            className={`card-tab-pill ${activeTab === 'preview' ? 'active' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveTab('preview');
+            }}
+            aria-label="View screenshot preview"
+          >
+            Screenshots
+          </button>
+          <button
+            type="button"
+            className={`card-tab-pill ${activeTab === 'details' ? 'active' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveTab('details');
+            }}
+            aria-label="View stack and details"
+          >
+            Stack & Details
+          </button>
+        </div>
+
+        <button
+          type="button"
+          className="card-top-expand"
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpen(project);
+          }}
+          aria-label="Open full popup modal with zoomable images"
+          title="Open in popup modal"
+        >
+          <ArrowUpRight size={17} aria-hidden="true" />
+        </button>
+      </div>
+
+      {activeTab === 'preview' ? (
+        <CardCarousel project={project} featured={featured} />
+      ) : (
+        <CardDetailsPanel project={project} featured={featured} onOpenModal={() => onOpen(project)} />
+      )}
+
+      <div className="project-copy">
+        <h3>{project.title}</h3>
+        <p>{project.summary}</p>
+        <div className="tag-row">
+          {project.stack.length > 0 ? (
+            project.stack.map(tag => (
+              <span className="tag" key={tag}>{tag}</span>
+            ))
+          ) : (
+            <span className="tag tag-dim">Full-Stack & DB</span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function Home() {
@@ -67,7 +144,7 @@ export default function Home() {
       <section className="work-section" id="work"><div className="section-wrap"><div className="section-heading work-heading"><div><span className="section-kicker">04 / SELECTED WORK</span><h2>Projects with a <span className="muted-heading">purpose.</span></h2></div><p className="section-side-note">A selection from mobile apps<br/>and business systems I’ve worked on.</p></div>
         <div className="featured-grid">{featured.map(project => <ProjectCard project={project} featured key={project.id} onOpen={setActiveProject}/>)}</div>
         <div className="all-projects-heading"><div><span className="section-kicker">THE FULL COLLECTION</span><h3>All projects <span>({projects.length})</span></h3></div><p>Explore all {projects.length} projects by name, type, or technology.</p></div>
-        <div className="project-controls"><div className="filters" role="group" aria-label="Filter projects by type">{categories.map(category => <button key={category} className={filter === category ? 'filter active' : 'filter'} onClick={() => setFilter(category)} aria-pressed={filter === category}>{category}</button>)}</div><label className="search-box"><Search size={16}/><input aria-label="Search projects" placeholder="Search projects or tools…" value={query} onChange={event => setQuery(event.target.value)}/>{query && <button className="clear-search" onClick={() => setQuery('')} aria-label="Clear search"><X size={14}/></button>}</label></div>
+        <div className="project-controls"><div className="filters" role="group" aria-label="Filter projects by type">{categories.map(category => <button key={category} className={filter === category ? 'filter active' : 'filter'} onClick={() => setFilter(category)} aria-pressed={filter === category}>{category}</button>)}</div><label className="search-box"><Search size={16}/><input aria-label="Search projects" placeholder="Search projects or tools…" value={query} onChange={event => setQuery(event.target.value)} suppressHydrationWarning/>{query && <button className="clear-search" onClick={() => setQuery('')} aria-label="Clear search"><X size={14}/></button>}</label></div>
         {visibleProjects.length ? <div className="projects-grid">{visibleProjects.map(project => <ProjectCard project={project} key={project.id} onOpen={setActiveProject}/>)}</div> : <div className="empty-state">No projects match that search. Try another term.</div>}
       </div></section>
 
@@ -75,6 +152,104 @@ export default function Home() {
     </main>
     <footer className="site-footer"><div className="section-wrap footer-inner"><a className="wordmark" href="#home">PN<span>.</span></a><span>© {new Date().getFullYear()} Pinindu Nuwandhara</span><div className="footer-social"><a href="https://github.com/Pinindu20" target="_blank" rel="noreferrer" aria-label="GitHub"><Github size={17}/></a><a href="https://www.linkedin.com/in/pinindu-nuwandhara-99a9832ba/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><Linkedin size={17}/></a><a href="mailto:nuwandhara2000@gmail.com" aria-label="Email"><Mail size={17}/></a></div><a className="back-top" href="#home">BACK TO TOP <ArrowUpRight size={13}/></a></div></footer>
 
-    {activeProject && <div className="modal-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setActiveProject(null); }}><section className="project-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button className="modal-close" onClick={() => setActiveProject(null)} aria-label="Close project details"><X size={19}/></button><div className={`modal-art art-${activeProject.id}`}><span>{activeProject.mark}</span></div><div className="modal-content"><span className="section-kicker">PROJECT {String(activeProject.id).padStart(2, '0')} / {activeProject.type.toUpperCase()}</span><h2 id="modal-title">{activeProject.title}</h2><p className="modal-summary">{activeProject.summary}</p><div className="tag-row modal-tags">{activeProject.stack.length ? activeProject.stack.map(tag => <span className="tag" key={tag}>{tag}</span>) : <span className="tag">Technology details not supplied</span>}</div><ul className="detail-list">{activeProject.details.map(detail => <li key={detail}>{detail}</li>)}</ul></div></section></div>}
+    {activeProject && (
+      <div
+        className="modal-backdrop"
+        role="presentation"
+        onMouseDown={event => {
+          if (event.target === event.currentTarget) setActiveProject(null);
+        }}
+      >
+        <section className="project-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+          <button className="modal-close" onClick={() => setActiveProject(null)} aria-label="Close project details">
+            <X size={19}/>
+          </button>
+          <ModalGallery project={activeProject} />
+          <div className="modal-content">
+            <span className="section-kicker">PROJECT {String(activeProject.id).padStart(2, '0')} / {activeProject.type.toUpperCase()}</span>
+            <h2 id="modal-title">{activeProject.title}</h2>
+            <div className="modal-summary-row">
+              <p className="modal-summary">{activeProject.summary}</p>
+              <button
+                type="button"
+                className="modal-jump-to-details"
+                onClick={() => {
+                  const detailsEl = document.getElementById('modal-details-anchor');
+                  detailsEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+                aria-label="Scroll to technology stack and project workflows"
+              >
+                <span>Scroll to details</span>
+                <ArrowDown size={12} />
+              </button>
+            </div>
+
+            {/* Technology Stack Section */}
+            <div className="modal-details-section" id="modal-details-anchor">
+              <div className="modal-details-kicker-row">
+                <span className="modal-details-kicker">TECHNOLOGY STACK</span>
+                <span className="modal-details-count">
+                  {activeProject.stack.length > 0
+                    ? `${activeProject.stack.length} technologies`
+                    : 'Full-stack'}
+                </span>
+              </div>
+              <div className="modal-stack-tags">
+                {activeProject.stack.length > 0 ? (
+                  activeProject.stack.map(tag => (
+                    <span className="modal-stack-tag" key={tag}>
+                      <Sparkles size={10} className="modal-tag-icon" />
+                      {tag}
+                    </span>
+                  ))
+                ) : (
+                  <span className="modal-stack-tag dim">Full-Stack Architecture &amp; DB Design</span>
+                )}
+              </div>
+            </div>
+
+            {/* Key Workflows & Details Section */}
+            {activeProject.details.length > 0 && (
+              <div className="modal-details-section">
+                <div className="modal-details-kicker-row">
+                  <span className="modal-details-kicker">KEY WORKFLOWS &amp; DETAILS</span>
+                  <span className="modal-details-count">{activeProject.details.length} features</span>
+                </div>
+                <ul className="modal-bullet-list">
+                  {activeProject.details.map((detail, idx) => (
+                    <li key={idx} className="modal-bullet-item">
+                      <span className="modal-bullet-icon">✳</span>
+                      <span>{detail}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Modal Bottom Action Controls */}
+            <div className="modal-bottom-actions">
+              <button
+                type="button"
+                className="modal-bottom-top-btn"
+                onClick={() => {
+                  const modal = document.querySelector('.project-modal');
+                  modal?.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              >
+                <ArrowUp size={13} />
+                <span>Back to screenshots</span>
+              </button>
+              <button
+                type="button"
+                className="modal-bottom-close-btn"
+                onClick={() => setActiveProject(null)}
+              >
+                Close Project
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    )}
   </>;
 }

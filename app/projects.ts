@@ -1,6 +1,17 @@
-export type Project = { id: number; title: string; type: 'Mobile' | 'Web'; summary: string; stack: string[]; details: string[]; mark: string };
+import { projectImages } from './projectImages';
 
-export const projects: Project[] = [
+export type Project = {
+  id: number;
+  title: string;
+  type: 'Mobile' | 'Web';
+  summary: string;
+  stack: string[];
+  details: string[];
+  mark: string;
+  images: string[];
+};
+
+const rawProjects: Omit<Project, 'images'>[] = [
   { id: 1, title: 'Sales Force Automation (SFA)', type: 'Mobile', summary: 'Sales, customer, attendance, and delivery workflows for field teams.', stack: ['Flutter', 'Dart', 'Dio', 'Provider', 'Laravel', 'REST APIs'], mark: 'SFA', details: ['Developed customer management, sales orders, receipts, invoices, returns, and outstanding-balance workflows.', 'Added attendance and customer-visit features, delivery confirmation, and order status screens.', 'Integrated mobile services with Laravel API controllers for sales, customers, receipts, returns, attendance, and reporting.', 'Included connectivity and location-related functionality.'] },
   { id: 2, title: 'Daily Call Reporting (DCR)', type: 'Mobile', summary: 'Field visit planning, coverage routes, attendance, and reporting.', stack: ['Flutter', 'Dart', 'Dio', 'Geolocation', 'Laravel', 'REST APIs'], mark: 'DCR', details: ['Built field workflows for doctor and healthcare-institute visits, coverage routes, itineraries, and day planning.', 'Added attendance marking with location-related screens.', 'Implemented manager review and DCR approval screens, plus activity and sales reports.', 'Connected mobile services to backend controllers for visits, planning, attendance, reporting, and sponsorship.'] },
   { id: 3, title: 'Mobile Representative', type: 'Mobile', summary: 'Customer ordering, invoice previews, and Bluetooth printing.', stack: ['Flutter', 'Dart', 'Dio', 'REST APIs', 'PDF'], mark: 'MR', details: ['Built screens for customer lists and details, price lists, order creation, and order history.', 'Connected the app to backend services for customer and order data.', 'Added invoice preview and PDF generation.', 'Implemented printer selection and Bluetooth printing.'] },
@@ -22,3 +33,8 @@ export const projects: Project[] = [
   { id: 19, title: 'Farmer’s Fertilizer Product Management', type: 'Web', summary: 'Purchase, costs, expenses, and searchable records for product management.', stack: [], mark: 'FF', details: ['Developed database-backed modules for purchase and other-cost management.', 'Built a searchable data table with filtering and sorting capabilities.', 'Added expense tracking for utility bills, maintenance, and miscellaneous costs.'] },
   { id: 20, title: 'DayTrail Tourism and Visit Planning System', type: 'Web', summary: 'Tourism place browsing, category filters, interactive visit planning, and location management.', stack: ['Laravel 12', 'PHP', 'Blade', 'Eloquent ORM', 'Database migrations', 'Cloudinary'], mark: 'DT', details: ['Built a tourism website to browse and filter places by category and view their locations on a map.', 'Developed a visit planner to add, remove, reorder, and save places into personal visit plans.', 'Added administrator features to manage places and categories, including place images and map coordinates.', 'Implemented distance calculations from a central location to help sort and display nearby places.', 'Database: Laravel models and migrations define users, roles, places, categories, visit plans, and plan-place relationships; the database engine is not confirmed.'] },
 ];
+
+export const projects: Project[] = rawProjects.map(project => ({
+  ...project,
+  images: projectImages[project.id] ?? [],
+}));
