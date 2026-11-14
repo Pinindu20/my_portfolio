@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import { ArrowDown, ArrowDownRight, ArrowRight, ArrowUp, ArrowUpRight, BriefcaseBusiness, Code2, Github, Linkedin, Mail, MapPin, Menu, MessageCircle, Phone, Search, Sparkles, X } from 'lucide-react';
 import { projects, type Project } from './projects';
 import { CardCarousel, CardDetailsPanel, ModalGallery } from './ProjectCarousel';
+import { ContactModal } from './ContactModal';
 
 const roles = ['Mobile Application Developer', 'Web Developer', 'Full-Stack Developer', 'Flutter Developer', 'Laravel Developer'];
 const featuredIds = [1, 2, 12, 16, 20, 14];
@@ -99,6 +100,7 @@ export default function Home() {
   const [query, setQuery] = useState('');
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [contactModalOpen, setContactModalOpen] = useState(false);
   const featured = useMemo(
     () => featuredIds.map(id => projects.find(project => project.id === id)).filter((p): p is Project => Boolean(p)),
     []
@@ -113,16 +115,16 @@ export default function Home() {
   return <>
     <header className="site-header"><a className="wordmark" href="#home" aria-label="Pinindu Nuwandhara home">Pinindu Nuwandhara<span>.</span></a>
       <button className="menu-toggle" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X/> : <Menu/>}</button>
-      <nav className={menuOpen ? 'nav open' : 'nav'} aria-label="Main navigation"><a href="#about" onClick={closeMenu}>About</a><a href="#experience" onClick={closeMenu}>Experience</a><a href="#work" onClick={closeMenu}>Projects</a><a href="#contact" onClick={closeMenu} className="nav-contact">Let’s talk <ArrowUpRight size={15}/></a></nav>
+      <nav className={menuOpen ? 'nav open' : 'nav'} aria-label="Main navigation"><a href="#about" onClick={closeMenu}>About</a><a href="#experience" onClick={closeMenu}>Experience</a><a href="#work" onClick={closeMenu}>Projects</a><button type="button" onClick={() => { closeMenu(); setContactModalOpen(true); }} className="nav-contact">Let’s talk <ArrowUpRight size={15}/></button></nav>
     </header>
 
     <main>
       <section className="hero section-wrap" id="home"><div className="hero-copy"><div className="eyebrow"><span className="status-dot"/> AVAILABLE FOR NEW OPPORTUNITIES</div>
         <h1>Building useful<br/><span className="gradient-text">digital products.</span></h1>
         <p className="hero-intro">I’m <strong>Pinindu Nuwandhara</strong>, a developer creating mobile and web applications with a focus on practical, thoughtful experiences.</p>
-        <div className="hero-actions"><a className="button button-primary" href="#work">Explore my work <ArrowDownRight size={17}/></a><a className="button button-quiet" href="#contact">Get in touch <ArrowRight size={16}/></a></div>
+        <div className="hero-actions"><a className="button button-primary" href="#work">Explore my work <ArrowDownRight size={17}/></a><button type="button" className="button button-quiet" onClick={() => setContactModalOpen(true)}>Get in touch <ArrowRight size={16}/></button></div>
         <div className="hero-meta"><span><MapPin size={15}/> Matara, Sri Lanka</span><span className="meta-divider"/><span>Web · Mobile · Full-stack</span></div>
-      </div><div className="hero-visual" aria-label="Pinindu Nuwandhara profile portrait and decorative graphic"><div className="visual-grid"/><div className="visual-glow"/><div className="orbit orbit-one"/><div className="orbit orbit-two"/><div className="hero-photo-wrap"><Image src="/profile.jpg" alt="Pinindu Nuwandhara" width={220} height={270} priority className="hero-photo"/><div className="photo-backdrop-glow"/></div><div className="float-chip chip-code"><Code2 size={15}/> Flutter / Laravel</div><div className="float-chip chip-build"><span className="status-dot"/> building with purpose</div><div className="visual-caption">PININDU NUWANDHARA · DEVELOPER</div></div>
+      </div><div className="hero-visual" aria-label="Pinindu Nuwandhara profile portrait and decorative graphic"><div className="visual-grid"/><div className="visual-glow"/><div className="orbit orbit-one"/><div className="orbit orbit-two"/><div className="hero-photo-wrap"><Image src="/profile.jpg" alt="Pinindu Nuwandhara" width={260} height={330} priority className="hero-photo"/><div className="photo-backdrop-glow"/></div><div className="float-chip chip-code"><Code2 size={15}/> Flutter / Laravel</div><div className="float-chip chip-build"><span className="status-dot"/> building with purpose</div><div className="visual-caption">PININDU NUWANDHARA · DEVELOPER</div></div>
         <a className="scroll-note" href="#about"><span>SCROLL TO EXPLORE</span><ArrowDown size={14}/></a>
       </section>
 
@@ -148,9 +150,11 @@ export default function Home() {
         {visibleProjects.length ? <div className="projects-grid">{visibleProjects.map(project => <ProjectCard project={project} key={project.id} onOpen={setActiveProject}/>)}</div> : <div className="empty-state">No projects match that search. Try another term.</div>}
       </div></section>
 
-      <section className="contact-section" id="contact"><div className="section-wrap contact-wrap"><div className="contact-top"><span className="section-kicker">05 / CONTACT</span><span className="contact-availability"><i/> OPEN TO OPPORTUNITIES</span></div><h2>Have a project<br/>in <span className="gradient-text">mind?</span></h2><div className="contact-bottom"><p>I’m open to conversations about developer roles and interesting projects. Feel free to reach out.</p><a className="button button-primary contact-cta" href="mailto:nuwandhara2000@gmail.com">Start a conversation <ArrowUpRight size={17}/></a></div><div className="contact-details"><a href="mailto:nuwandhara2000@gmail.com"><Mail size={15}/> nuwandhara2000@gmail.com</a><a href="tel:+94701046544"><Phone size={15}/> +94 701 046 544</a><a href="https://wa.me/qr/76XMH3LYYADSP1" target="_blank" rel="noreferrer"><MessageCircle size={15}/> WhatsApp</a></div></div></section>
+      <section className="contact-section" id="contact"><div className="section-wrap contact-wrap"><div className="contact-top"><span className="section-kicker">05 / CONTACT</span><span className="contact-availability"><i/> OPEN TO OPPORTUNITIES</span></div><h2>Have a project<br/>in <span className="gradient-text">mind?</span></h2><div className="contact-bottom"><p>I’m open to conversations about developer roles and interesting projects. Feel free to reach out.</p><button type="button" className="button button-primary contact-cta" onClick={() => setContactModalOpen(true)}>Start a conversation <ArrowUpRight size={17}/></button></div><div className="contact-details"><a href="mailto:nuwandhara2000@gmail.com"><Mail size={15}/> nuwandhara2000@gmail.com</a><a href="tel:+94701046544"><Phone size={15}/> +94 701 046 544</a><a href="https://wa.me/qr/76XMH3LYYADSP1" target="_blank" rel="noreferrer"><MessageCircle size={15}/> WhatsApp</a></div></div></section>
     </main>
     <footer className="site-footer"><div className="section-wrap footer-inner"><a className="wordmark" href="#home">PN<span>.</span></a><span>© {new Date().getFullYear()} Pinindu Nuwandhara</span><div className="footer-social"><a href="https://github.com/Pinindu20" target="_blank" rel="noreferrer" aria-label="GitHub"><Github size={17}/></a><a href="https://www.linkedin.com/in/pinindu-nuwandhara-99a9832ba/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><Linkedin size={17}/></a><a href="mailto:nuwandhara2000@gmail.com" aria-label="Email"><Mail size={17}/></a></div><a className="back-top" href="#home">BACK TO TOP <ArrowUpRight size={13}/></a></div></footer>
+
+    <ContactModal isOpen={contactModalOpen} onClose={() => setContactModalOpen(false)} />
 
     {activeProject && (
       <div
